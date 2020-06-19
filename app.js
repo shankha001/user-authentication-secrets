@@ -3,7 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
-
+const encrypt = require("mongoose-encryption");
 const app = express();
 
 const port = process.env.PORT || 3000;
@@ -18,10 +18,14 @@ mongoose.connect(
   { useUnifiedTopology: true, useNewUrlParser: true }
 );
 
-const userSchema = {
+const userSchema = new mongoose.Schema({
   email: String,
   password: String,
-};
+});
+
+const secret = "Thisisourlittlesecret";
+
+userSchema.plugin(encrypt, { secret: secret, encryptedFields: ["password"] });
 
 const User = new mongoose.model("User", userSchema);
 
@@ -64,4 +68,5 @@ app.post("/login", (req, res) => {
     }
   });
 });
+
 app.listen(port, () => console.log(`Server started at port: ${port}`));
